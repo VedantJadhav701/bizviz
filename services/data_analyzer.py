@@ -8,6 +8,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Dict, List, Any, Tuple
 import numpy as np
+import os
+import json
+from groq import Groq
 
 
 class DataAnalyzer:
@@ -18,6 +21,90 @@ class DataAnalyzer:
         self.df = df
         self.insights = []
         self.charts = []
+        self.groq_client = None
+        
+        # Initialize Groq client if API key is available
+        try:
+            api_key = os.getenv('GROQ_API_KEY')
+            if api_key:
+                self.groq_client = Groq(api_key=api_key)
+        except Exception as e:
+            print(f"⚠️ Groq API not available: {e}")
+    
+    def _parse_user_goal_with_ai(self, user_goal: str, available_columns: List[str]) -> Dict[str, Any]:
+        """
+        Use Groq AI to parse user's natural language goal and map it to actual columns.
+        
+        Args:
+            user_goal: User's description like "effect of delivery date, zone on shipping fee"
+            available_columns: List of available column names in the dataset
+            
+        Returns:
+            Dictionary with parsed chart requirements:
+            {
+                'chart_type': 'bar' | 'line' | 'scatter' | 'box' | 'pie',
+                'x_axis': 'column_name',
+                'y_axis': 'column_name',
+                'group_by': 'column_name' (optional),
+                'explanation': 'Why this chart answers the question'
+            }
+        """
+        if not self.groq_client or not user_goal:
+            return None
+        
+        try:
+            prompt = f"""You are a data visualization expert. Analyze this user's request and map it to the available columns.
+
+User Request: "{user_goal}"
+
+Available Columns: {', '.join(available_columns)}
+
+Task: Parse the user's request and determine:
+1. What chart type would best answer their question (bar, line, scatter, box, pie)
+2. Which columns should be used for X-axis, Y-axis, and grouping
+3. Brief explanation of why this chart answers their question
+
+Respond ONLY with valid JSON in this exact format:
+{{
+    "chart_type": "bar",
+    "x_axis": "column_name",
+    "y_axis": "column_name", 
+    "group_by": "column_name or null",
+    "explanation": "Brief explanation"
+}}
+
+Rules:
+- Use EXACT column names from the available list
+- Choose chart_type from: bar, line, scatter, box, pie
+- If user asks about "effect of A on B", A is typically x_axis, B is y_axis
+- If multiple factors mentioned, use group_by for the second factor
+- Keep explanation under 20 words"""
+
+            response = self.groq_client.chat.completions.create(
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }],
+                model="llama-3.1-70b-versatile",
+                temperature=0.3,
+                max_tokens=500
+            )
+            
+            result_text = response.choices[0].message.content.strip()
+            
+            # Extract JSON from response (in case there's extra text)
+            if '```json' in result_text:
+                result_text = result_text.split('```json')[1].split('```')[0].strip()
+            elif '```' in result_text:
+                result_text = result_text.split('```')[1].split('```')[0].strip()
+            
+            result = json.loads(result_text)
+            print(f"✅ AI parsed user goal: {result}")
+            return result
+            
+        except Exception as e:
+            print(f"⚠️ AI parsing failed: {e}")
+            return None
         
     def analyze_data(self) -> Dict[str, Any]:
         """
@@ -320,6 +407,135 @@ class DataAnalyzer:
         print(f"   Numeric columns: {len(numeric_cols)} - {numeric_cols[:3]}")
         print(f"   Categorical columns: {len(categorical_cols)} - {categorical_cols[:3]}")
         print(f"   Date columns: {len(date_cols)} - {date_cols}")
+        
+        # =============================================================================
+        # AI-POWERED GOAL PARSING - Generate specific chart from user's natural language
+        # =============================================================================
+        if data_goal and len(data_goal.strip()) > 5:
+            print(f"🤖 Using AI to parse user goal: '{data_goal}'")
+            all_columns = list(df.columns)
+            ai_result = self._parse_user_goal_with_ai(data_goal, all_columns)
+            
+            if ai_result and ai_result.get('x_axis') and ai_result.get('y_axis'):
+                try:
+                    x_col = ai_result['x_axis']
+                    y_col = ai_result['y_axis']
+                    group_col = ai_result.get('group_by')
+                    chart_type = ai_result.get('chart_type', 'bar')
+                    
+                    # Validate columns exist
+                    if x_col in df.columns and y_col in df.columns:
+                        print(f"✅ AI mapped: {x_col} (X) vs {y_col} (Y), grouped by {group_col}, chart type: {chart_type}")
+                        
+                        # Get design constraints
+                        design = self._get_color_palette_and_constraints(chart_type, 'comparison')
+                        
+                        # Create the specific chart based on AI recommendation
+                        if chart_type == 'bar':
+                            # Bar chart with grouping
+                            if group_col and group_col in df.columns:
+                                # Grouped bar chart
+                                agg_df = df.groupby([x_col, group_col])[y_col].mean().reset_index()
+                                top_x = agg_df[x_col].value_counts().head(10).index
+                                agg_df = agg_df[agg_df[x_col].isin(top_x)]
+                                
+                                fig = px.bar(
+                                    agg_df,
+                                    x=x_col,
+                                    y=y_col,
+                                    color=group_col,
+                                    title=f'📊 {ai_result.get("explanation", "Analysis")}{sample_note}',
+                                    labels={x_col: x_col, y_col: y_col},
+                                    barmode='group',
+                                    color_discrete_sequence=design['color_palette']
+                                )
+                            else:
+                                # Simple bar chart
+                                agg_df = df.groupby(x_col)[y_col].mean().nlargest(15).sort_values()
+                                fig = go.Figure(data=[
+                                    go.Bar(
+                                        x=agg_df.values,
+                                        y=agg_df.index,
+                                        orientation='h',
+                                        marker=dict(color=agg_df.values, colorscale=design['colorscale'], showscale=False),
+                                        text=[f'{val:,.2f}' for val in agg_df.values],
+                                        textposition='auto'
+                                    )
+                                ])
+                                fig.update_layout(
+                                    title=f'📊 {ai_result.get("explanation", "Analysis")}{sample_note}',
+                                    xaxis_title=y_col,
+                                    yaxis_title=x_col,
+                                    height=500
+                                )
+                            
+                        elif chart_type == 'line':
+                            # Line chart (time series)
+                            df_time = df[[x_col, y_col]].copy()
+                            df_time[x_col] = pd.to_datetime(df_time[x_col], errors='coerce')
+                            df_time = df_time.dropna()
+                            daily_data = df_time.groupby(df_time[x_col].dt.date)[y_col].mean().reset_index()
+                            daily_data.columns = ['Date', y_col]
+                            
+                            fig = px.line(
+                                daily_data,
+                                x='Date',
+                                y=y_col,
+                                title=f'📈 {ai_result.get("explanation", "Trend Analysis")}{sample_note}',
+                                labels={'Date': x_col, y_col: y_col}
+                            )
+                            fig.update_traces(line_color=design['color_palette'][0], line_width=3)
+                            
+                        elif chart_type == 'scatter':
+                            # Scatter plot
+                            sample_df = df[[x_col, y_col]].dropna().sample(min(1000, len(df)), random_state=42)
+                            fig = px.scatter(
+                                sample_df,
+                                x=x_col,
+                                y=y_col,
+                                title=f'🔍 {ai_result.get("explanation", "Relationship Analysis")}{sample_note}',
+                                labels={x_col: x_col, y_col: y_col},
+                                color_discrete_sequence=[design['color_palette'][0]],
+                                trendline="ols"
+                            )
+                            
+                        elif chart_type == 'box':
+                            # Box plot
+                            fig = px.box(
+                                df_viz,
+                                x=x_col,
+                                y=y_col,
+                                title=f'📦 {ai_result.get("explanation", "Distribution Analysis")}{sample_note}',
+                                labels={x_col: x_col, y_col: y_col},
+                                color_discrete_sequence=[design['color_palette'][0]]
+                            )
+                            
+                        else:  # Default to bar
+                            agg_df = df.groupby(x_col)[y_col].mean().nlargest(15).sort_values()
+                            fig = go.Figure(data=[
+                                go.Bar(
+                                    x=agg_df.values,
+                                    y=agg_df.index,
+                                    orientation='h',
+                                    marker=dict(color=design['color_palette'][0])
+                                )
+                            ])
+                            fig.update_layout(title=f'📊 {ai_result.get("explanation", "Analysis")}{sample_note}')
+                        
+                        fig.update_layout(height=500)
+                        
+                        charts.append({
+                            'figure': fig,
+                            'title': f'🤖 AI Generated: {data_goal}',
+                            'description': ai_result.get('explanation', 'Chart generated from your request'),
+                            'chart_type': chart_type.capitalize() + ' Chart',
+                            'color_palette': design['color_names'][:3],
+                            'design_constraints': design['design_constraints']
+                        })
+                        print(f"✅ Created AI-generated chart based on user goal")
+                        
+                except Exception as e:
+                    print(f"⚠️ Failed to create AI-generated chart: {e}")
         
         # Detect user's intent from their goal
         user_intent = self._detect_chart_intent(data_goal if data_goal else "")

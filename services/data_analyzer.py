@@ -49,48 +49,65 @@ class DataAnalyzer:
                 'explanation': 'Why this chart answers the question'
             }
         """
-        if not self.groq_client or not user_goal:
+        if not self.groq_client:
+            print("⚠️ Groq client not initialized")
+            return None
+            
+        if not user_goal or len(user_goal.strip()) < 3:
+            print("⚠️ User goal too short or empty")
             return None
         
         try:
+            # Create a more detailed column description
+            column_info = []
+            for col in available_columns[:50]:  # Limit to first 50 columns
+                sample_vals = self.df[col].dropna().head(3).tolist()
+                col_type = str(self.df[col].dtype)
+                column_info.append(f"{col} ({col_type})")
+            
             prompt = f"""You are a data visualization expert. Analyze this user's request and map it to the available columns.
 
 User Request: "{user_goal}"
 
-Available Columns: {', '.join(available_columns)}
+Available Columns (with types):
+{chr(10).join(column_info)}
 
 Task: Parse the user's request and determine:
 1. What chart type would best answer their question (bar, line, scatter, box, pie)
 2. Which columns should be used for X-axis, Y-axis, and grouping
 3. Brief explanation of why this chart answers their question
 
+Important:
+- For "relationship between A and B", use scatter plot with A as x_axis, B as y_axis
+- For "effect of A on B", A is x_axis, B is y_axis
+- Match user's terms to column names (e.g., "price" might match "Price" or "Unit Price")
+- If user mentions multiple factors, use group_by for secondary factor
+
 Respond ONLY with valid JSON in this exact format:
 {{
-    "chart_type": "bar",
-    "x_axis": "column_name",
-    "y_axis": "column_name", 
-    "group_by": "column_name or null",
-    "explanation": "Brief explanation"
+    "chart_type": "scatter",
+    "x_axis": "exact_column_name",
+    "y_axis": "exact_column_name", 
+    "group_by": null,
+    "explanation": "Shows correlation between X and Y"
 }}
 
-Rules:
-- Use EXACT column names from the available list
-- Choose chart_type from: bar, line, scatter, box, pie
-- If user asks about "effect of A on B", A is typically x_axis, B is y_axis
-- If multiple factors mentioned, use group_by for the second factor
-- Keep explanation under 20 words"""
+Chart type options: bar, line, scatter, box, pie"""
 
+            print(f"🤖 Sending to Groq AI: '{user_goal}'")
+            
             response = self.groq_client.chat.completions.create(
                 messages=[{
                     "role": "user",
                     "content": prompt
                 }],
                 model="llama-3.1-70b-versatile",
-                temperature=0.3,
+                temperature=0.2,
                 max_tokens=500
             )
             
             result_text = response.choices[0].message.content.strip()
+            print(f"🤖 AI Response: {result_text[:200]}...")
             
             # Extract JSON from response (in case there's extra text)
             if '```json' in result_text:
@@ -99,11 +116,43 @@ Rules:
                 result_text = result_text.split('```')[1].split('```')[0].strip()
             
             result = json.loads(result_text)
+            
+            # Validate column names exist (case-insensitive matching)
+            def find_column(col_name):
+                if not col_name:
+                    return None
+                # Exact match first
+                if col_name in available_columns:
+                    return col_name
+                # Case-insensitive match
+                for col in available_columns:
+                    if col.lower() == col_name.lower():
+                        return col
+                # Partial match
+                for col in available_columns:
+                    if col_name.lower() in col.lower() or col.lower() in col_name.lower():
+                        return col
+                return None
+            
+            # Try to find matching columns
+            x_col = find_column(result.get('x_axis'))
+            y_col = find_column(result.get('y_axis'))
+            group_col = find_column(result.get('group_by'))
+            
+            if x_col:
+                result['x_axis'] = x_col
+            if y_col:
+                result['y_axis'] = y_col
+            if group_col:
+                result['group_by'] = group_col
+            
             print(f"✅ AI parsed user goal: {result}")
             return result
             
         except Exception as e:
             print(f"⚠️ AI parsing failed: {e}")
+            import traceback
+            traceback.print_exc()
             return None
         
     def analyze_data(self) -> Dict[str, Any]:

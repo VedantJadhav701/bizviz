@@ -8,6 +8,7 @@ import json
 import pandas as pd
 import io
 import base64
+import os
 from services.visualization_assistant import VisualizationAssistant
 from services.data_analyzer import DataAnalyzer
 from utils.formatting import (
@@ -18,6 +19,18 @@ from utils.formatting import (
     get_intent_description,
     export_to_json
 )
+
+# Configure Groq API key from Streamlit secrets or environment
+try:
+    if 'GROQ_API_KEY' in st.secrets:
+        os.environ['GROQ_API_KEY'] = st.secrets['GROQ_API_KEY']
+        print("✅ Groq API key loaded from Streamlit secrets")
+    elif os.getenv('GROQ_API_KEY'):
+        print("✅ Groq API key loaded from environment")
+    else:
+        print("⚠️ Groq API key not found - AI features will be limited")
+except Exception as e:
+    print(f"⚠️ Could not load Groq API key: {e}")
 
 
 # Check if Kaleido is available for PNG export

@@ -1,0 +1,47 @@
+CampaignDate,CampaignName,Channel,Impressions,Clicks,Conversions,CostPerClick,Revenue,ProductCategory,TargetAge,TargetGender
+2024-01-15,Spring Sale,Facebook,125000,3250,156,0.85,18720.00,Fashion,25-34,Female
+2024-01-16,New Arrivals,Instagram,98000,2850,142,0.92,17040.00,Fashion,18-24,Female
+2024-01-17,Tech Deals,Google Ads,156000,4250,198,1.25,29700.00,Electronics,35-44,Male
+2024-01-18,Home Comfort,Email,45000,1850,89,0.35,10680.00,Home,45-54,Female
+2024-01-19,Fitness Gear,Facebook,112000,2950,165,0.78,19800.00,Sports,25-34,Male
+2024-01-20,Beauty Sale,Instagram,135000,3680,178,0.88,21360.00,Beauty,18-24,Female
+2024-01-21,Back to School,Google Ads,145000,3950,185,1.15,22200.00,Education,35-44,Mixed
+2024-01-22,Weekend Special,Email,52000,2150,102,0.42,12240.00,Fashion,25-34,Female
+2024-01-23,Gaming Week,Facebook,168000,4850,225,1.35,27000.00,Electronics,18-24,Male
+2024-01-24,Kitchen Essentials,Instagram,95000,2650,128,0.95,15360.00,Home,45-54,Female
+2024-01-25,Outdoor Adventure,Google Ads,142000,3850,172,1.20,20640.00,Sports,35-44,Male
+2024-01-26,Makeup Monday,Facebook,125000,3450,168,0.82,20160.00,Beauty,25-34,Female
+2024-01-27,Smart Home,Email,48000,1950,95,0.38,11400.00,Electronics,45-54,Mixed
+2024-01-28,Fashion Forward,Instagram,138000,3750,182,0.89,21840.00,Fashion,18-24,Female
+2024-01-29,Fitness Friday,Google Ads,152000,4150,195,1.18,23400.00,Sports,25-34,Male
+2024-01-30,Home Decor,Facebook,118000,3150,148,0.80,17760.00,Home,35-44,Female
+2024-02-01,Valentine Special,Instagram,185000,5250,245,0.95,29400.00,Fashion,25-34,Mixed
+2024-02-02,Tech Tuesday,Google Ads,168000,4650,218,1.28,26160.00,Electronics,35-44,Male
+2024-02-03,Beauty Box,Email,58000,2350,112,0.45,13440.00,Beauty,25-34,Female
+2024-02-04,Sports Sunday,Facebook,145000,3950,185,0.85,22200.00,Sports,18-24,Male
+2024-02-05,Home Refresh,Instagram,108000,2950,142,0.92,17040.00,Home,45-54,Female
+2024-02-06,Fashion Flash,Google Ads,158000,4350,202,1.22,24240.00,Fashion,25-34,Female
+2024-02-07,Gaming Gear,Email,52000,2150,105,0.40,12600.00,Electronics,18-24,Male
+2024-02-08,Skincare Special,Facebook,142000,3850,178,0.88,21360.00,Beauty,35-44,Female
+2024-02-09,Workout Wednesday,Instagram,125000,3450,168,0.90,20160.00,Sports,25-34,Mixed
+2024-02-10,Kitchen Sale,Google Ads,135000,3750,172,1.15,20640.00,Home,45-54,Female
+2024-02-11,Spring Preview,Facebook,152000,4150,195,0.92,23400.00,Fashion,18-24,Female
+2024-02-12,Tech Trends,Email,48000,1950,92,0.38,11040.00,Electronics,35-44,Male
+2024-02-13,Beauty Bundle,Instagram,165000,4550,212,0.94,25440.00,Beauty,25-34,Female
+2024-02-14,Valentine's Day,Google Ads,225000,6250,295,1.45,35400.00,Fashion,25-34,Mixed
+2024-02-15,Fitness Goals,Facebook,138000,3750,178,0.85,21360.00,Sports,35-44,Male
+2024-02-16,Home Essentials,Instagram,115000,3150,148,0.95,17760.00,Home,45-54,Female
+2024-02-17,Weekend Fashion,Email,55000,2250,108,0.42,12960.00,Fashion,25-34,Female
+2024-02-18,Gaming Marathon,Google Ads,178000,4950,232,1.32,27840.00,Electronics,18-24,Male
+2024-02-19,Beauty Boost,Facebook,148000,4050,192,0.90,23040.00,Beauty,25-34,Female
+2024-02-20,Sports Special,Instagram,128000,3550,165,0.92,19800.00,Sports,18-24,Mixed
+2024-03-01,March Madness,Google Ads,185000,5150,242,1.38,29040.00,Sports,25-34,Male
+2024-03-02,Spring Fashion,Facebook,168000,4550,215,0.95,25800.00,Fashion,18-24,Female
+2024-03-03,Tech Deals,Email,52000,2150,102,0.40,12240.00,Electronics,35-44,Male
+2024-03-04,Beauty Bonanza,Instagram,158000,4350,205,0.96,24600.00,Beauty,25-34,Female
+2024-03-05,Home Makeover,Google Ads,145000,3950,185,1.20,22200.00,Home,45-54,Female
+2024-03-06,Fitness Friday,Facebook,135000,3750,178,0.88,21360.00,Sports,35-44,Mixed
+2024-03-07,Weekend Sale,Instagram,142000,3850,182,0.92,21840.00,Fashion,25-34,Female
+2024-03-08,Gaming Deals,Google Ads,172000,4750,222,1.35,26640.00,Electronics,18-24,Male
+2024-03-09,Beauty Day,Email,58000,2350,115,0.45,13800.00,Beauty,35-44,Female
+2024-03-10,Sports Sunday,Facebook,152000,4150,198,0.90,23760.00,Sports,25-34,Male

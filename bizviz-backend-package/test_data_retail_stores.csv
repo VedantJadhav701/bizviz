@@ -1,0 +1,51 @@
+Date,StoreName,City,State,TotalSales,NumberOfCustomers,AverageTransaction,TopCategory,Weather,DayOfWeek
+2024-01-01,Downtown Store,New York,NY,12450.50,156,79.81,Groceries,Sunny,Monday
+2024-01-02,Uptown Mall,Los Angeles,CA,15680.75,203,77.25,Electronics,Cloudy,Tuesday
+2024-01-03,Eastside Plaza,Chicago,IL,9875.25,128,77.15,Clothing,Rainy,Wednesday
+2024-01-04,Westend Center,Houston,TX,18920.00,245,77.22,Home Goods,Sunny,Thursday
+2024-01-05,Southgate Mall,Phoenix,AZ,14320.80,178,80.45,Groceries,Sunny,Friday
+2024-01-06,Northside Hub,Philadelphia,PA,16540.25,198,83.54,Electronics,Cloudy,Saturday
+2024-01-07,Central Square,San Antonio,TX,11250.50,145,77.59,Clothing,Sunny,Sunday
+2024-01-08,Downtown Store,New York,NY,13680.75,168,81.43,Groceries,Cloudy,Monday
+2024-01-09,Uptown Mall,Los Angeles,CA,17250.00,215,80.23,Electronics,Sunny,Tuesday
+2024-01-10,Eastside Plaza,Chicago,IL,10450.25,135,77.41,Home Goods,Snowy,Wednesday
+2024-01-11,Westend Center,Houston,TX,19850.50,258,76.94,Groceries,Sunny,Thursday
+2024-01-12,Southgate Mall,Phoenix,AZ,15120.75,189,80.00,Electronics,Sunny,Friday
+2024-01-13,Northside Hub,Philadelphia,PA,17680.00,210,84.19,Clothing,Rainy,Saturday
+2024-01-14,Central Square,San Antonio,TX,12350.25,155,79.68,Home Goods,Cloudy,Sunday
+2024-01-15,Downtown Store,New York,NY,14250.50,175,81.43,Groceries,Sunny,Monday
+2024-01-16,Uptown Mall,Los Angeles,CA,18450.75,228,80.92,Electronics,Cloudy,Tuesday
+2024-01-17,Eastside Plaza,Chicago,IL,11280.00,142,79.44,Clothing,Snowy,Wednesday
+2024-01-18,Westend Center,Houston,TX,20680.25,265,78.04,Groceries,Sunny,Thursday
+2024-01-19,Southgate Mall,Phoenix,AZ,16250.50,198,82.07,Home Goods,Sunny,Friday
+2024-01-20,Northside Hub,Philadelphia,PA,18920.75,225,84.09,Electronics,Cloudy,Saturday
+2024-02-01,Downtown Store,New York,NY,13850.00,172,80.52,Groceries,Rainy,Thursday
+2024-02-02,Uptown Mall,Los Angeles,CA,16920.50,208,81.35,Electronics,Sunny,Friday
+2024-02-03,Eastside Plaza,Chicago,IL,10680.75,138,77.40,Clothing,Snowy,Saturday
+2024-02-04,Westend Center,Houston,TX,19250.00,248,77.62,Home Goods,Sunny,Sunday
+2024-02-05,Southgate Mall,Phoenix,AZ,15680.25,195,80.41,Groceries,Sunny,Monday
+2024-02-06,Northside Hub,Philadelphia,PA,17850.50,215,83.00,Electronics,Cloudy,Tuesday
+2024-02-07,Central Square,San Antonio,TX,12680.75,160,79.25,Clothing,Sunny,Wednesday
+2024-02-08,Downtown Store,New York,NY,14680.00,182,80.66,Groceries,Cloudy,Thursday
+2024-02-09,Uptown Mall,Los Angeles,CA,18850.25,235,80.21,Electronics,Sunny,Friday
+2024-02-10,Eastside Plaza,Chicago,IL,11680.50,148,78.92,Home Goods,Rainy,Saturday
+2024-02-11,Westend Center,Houston,TX,21250.75,272,78.13,Groceries,Sunny,Sunday
+2024-02-12,Southgate Mall,Phoenix,AZ,16850.00,205,82.20,Electronics,Sunny,Monday
+2024-02-13,Northside Hub,Philadelphia,PA,19250.25,230,83.70,Clothing,Snowy,Tuesday
+2024-02-14,Central Square,San Antonio,TX,13250.50,168,78.87,Home Goods,Sunny,Wednesday
+2024-02-15,Downtown Store,New York,NY,15250.75,188,81.12,Groceries,Cloudy,Thursday
+2024-02-16,Uptown Mall,Los Angeles,CA,19680.00,242,81.32,Electronics,Sunny,Friday
+2024-02-17,Eastside Plaza,Chicago,IL,12250.25,155,79.03,Clothing,Snowy,Saturday
+2024-02-18,Westend Center,Houston,TX,22150.50,285,77.72,Groceries,Sunny,Sunday
+2024-02-19,Southgate Mall,Phoenix,AZ,17680.75,215,82.23,Home Goods,Sunny,Monday
+2024-02-20,Northside Hub,Philadelphia,PA,20150.00,240,83.96,Electronics,Rainy,Tuesday
+2024-03-01,Downtown Store,New York,NY,14850.25,185,80.27,Groceries,Sunny,Friday
+2024-03-02,Uptown Mall,Los Angeles,CA,18250.50,225,81.11,Electronics,Cloudy,Saturday
+2024-03-03,Eastside Plaza,Chicago,IL,11850.75,152,77.97,Clothing,Rainy,Sunday
+2024-03-04,Westend Center,Houston,TX,21680.00,278,78.00,Home Goods,Sunny,Monday
+2024-03-05,Southgate Mall,Phoenix,AZ,16250.25,200,81.25,Groceries,Sunny,Tuesday
+2024-03-06,Northside Hub,Philadelphia,PA,18680.50,222,84.15,Electronics,Cloudy,Wednesday
+2024-03-07,Central Square,San Antonio,TX,13150.75,165,79.70,Clothing,Sunny,Thursday
+2024-03-08,Downtown Store,New York,NY,15850.00,195,81.28,Groceries,Rainy,Friday
+2024-03-09,Uptown Mall,Los Angeles,CA,20250.25,248,81.65,Electronics,Sunny,Saturday
+2024-03-10,Eastside Plaza,Chicago,IL,12680.50,160,79.25,Home Goods,Cloudy,Sunday

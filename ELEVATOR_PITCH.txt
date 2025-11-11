@@ -1,0 +1,45 @@
+🚀 DATA VISUALIZATION ASSISTANT - THE 30 SECOND PITCH
+
+Built an AI-powered tool that analyzes business data and gives you instant insights + recommendations.
+
+WHAT IT DOES:
+Upload CSV → 5 seconds → Get 5 insights + 5 charts + recommendations
+
+EXAMPLE:
+"Your return rate is 27% (industry avg 15%). Recommendation: Improve product descriptions and add more images."
+
+WHY IT'S UNIQUE:
+❌ Tableau/PowerBI: Just show charts
+✅ This: Shows charts + Tells you what to DO
+
+SPEED:
+Traditional: 30-60 minutes
+This: 5 seconds (600x faster!)
+
+COST:
+Traditional: $10-70/month or hire analyst
+This: FREE
+
+USE CASES:
+- E-commerce: Reduce returns, increase sales
+- Retail: Compare store performance
+- Marketing: Optimize campaign ROI
+- Any business: Make data-driven decisions
+
+TECH:
+Python + Streamlit + Plotly + AI
+Handles 100K+ rows instantly
+
+TRY IT:
+streamlit run app_enhanced.py
+(Included 3 test datasets)
+
+TIME TO VALUE: 2 minutes setup, 5 seconds per analysis
+
+BOTTOM LINE:
+Like ChatGPT but for business data - except it actually analyzes your files and gives you charts + actionable advice.
+
+GitHub: [your-link]
+Demo: http://localhost:8502
+
+Questions? Run it - you'll get it in 30 seconds! ⚡📊

@@ -1,0 +1,32 @@
+{
+  "intent": "proportion",
+  "recommendations": [
+    {
+      "name": "Pie Chart",
+      "rationale": "Best for showing parts of a whole when you have 3-6 categories. Easy to grasp at a glance.",
+      "constraints": {
+        "color": "Use distinct, easily distinguishable colors. Avoid too many similar shades.",
+        "axis": "No axes needed. Ensure slices are properly sized by percentage.",
+        "label": "Show percentage labels on slices. Include category names and consider a legend for clarity."
+      }
+    },
+    {
+      "name": "Donut Chart",
+      "rationale": "Similar to pie chart but with center space for displaying totals or key metrics.",
+      "constraints": {
+        "color": "Use a cohesive color palette. Order slices from largest to smallest clockwise.",
+        "axis": "No axes. Use center space wisely for summary information.",
+        "label": "Label percentages and values. Add a descriptive title in the center if space allows."
+      }
+    },
+    {
+      "name": "Stacked Bar Chart",
+      "rationale": "Shows composition while allowing comparison across categories. Works well with multiple groups.",
+      "constraints": {
+        "color": "Use consistent colors for each component across all bars. Include a clear legend.",
+        "axis": "Y-axis typically shows 0-100% or absolute totals. Keep bars of equal width.",
+        "label": "Label each segment if space allows. Show total at the end of each bar."
+      }
+    }
+  ]
+}

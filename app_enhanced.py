@@ -404,6 +404,27 @@ def show_data_analysis_mode():
                                     pass  # Silently skip if export fails
                         
                         st.write(chart_data['description'])
+                        
+                        # Display chart type and color palette
+                        if 'chart_type' in chart_data:
+                            col_type, col_palette = st.columns([1, 2])
+                            with col_type:
+                                st.markdown(f"**📊 Type:** `{chart_data['chart_type']}`")
+                            with col_palette:
+                                if 'color_palette' in chart_data:
+                                    colors_text = ", ".join(chart_data['color_palette'])
+                                    st.markdown(f"**🎨 Colors:** {colors_text}")
+                        
+                        # Display 3 key visual design constraints
+                        if 'design_constraints' in chart_data:
+                            with st.expander("🎯 Visual Design Constraints", expanded=False):
+                                constraints = chart_data['design_constraints']
+                                st.markdown(f"""
+                                1. **Color Palette:** {constraints['1_color_palette']}
+                                2. **Axis Scale:** {constraints['2_axis_scale']}
+                                3. **Labeling Focus:** {constraints['3_labeling_focus']}
+                                """)
+                        
                         st.plotly_chart(chart_data['figure'], use_container_width=True)
                         st.divider()
             

@@ -154,6 +154,102 @@ class DataAnalyzer:
         # Limit to top 5 insights
         return insights[:5]
     
+    def _get_color_palette_and_constraints(self, chart_type: str, user_intent: str) -> Dict[str, Any]:
+        """
+        Generate color palette and 3 key visual design constraints for each chart.
+        
+        Args:
+            chart_type: Type of chart (bar, line, scatter, pie, histogram, box)
+            user_intent: User's goal (trend, comparison, distribution, proportion, relationship)
+            
+        Returns:
+            Dictionary with color_palette, color_names, and 3 design constraints
+        """
+        # Define color palettes based on chart type and intent
+        palettes = {
+            'trend_line': {
+                'colors': ['#3498db', '#2980b9', '#1abc9c', '#16a085'],
+                'names': ['Azure Blue', 'Royal Blue', 'Turquoise', 'Sea Green'],
+                'colorscale': 'Blues'
+            },
+            'comparison_bar': {
+                'colors': ['#e74c3c', '#c0392b', '#e67e22', '#d35400'],
+                'names': ['Crimson Red', 'Deep Red', 'Tangerine', 'Burnt Orange'],
+                'colorscale': 'Viridis'
+            },
+            'distribution_hist': {
+                'colors': ['#9b59b6', '#8e44ad', '#e74c3c', '#c0392b'],
+                'names': ['Amethyst Purple', 'Deep Purple', 'Crimson', 'Dark Red'],
+                'colorscale': 'Purples'
+            },
+            'proportion_pie': {
+                'colors': ['#3498db', '#e74c3c', '#f39c12', '#2ecc71', '#9b59b6', '#1abc9c'],
+                'names': ['Azure', 'Crimson', 'Golden', 'Emerald', 'Amethyst', 'Turquoise'],
+                'colorscale': 'Set3'
+            },
+            'relationship_scatter': {
+                'colors': ['#2ecc71', '#27ae60', '#f39c12', '#e67e22'],
+                'names': ['Emerald Green', 'Forest Green', 'Golden Yellow', 'Orange'],
+                'colorscale': 'Viridis'
+            },
+            'default': {
+                'colors': ['#3498db', '#e74c3c', '#f39c12', '#2ecc71'],
+                'names': ['Azure', 'Crimson', 'Golden', 'Emerald'],
+                'colorscale': 'Plotly'
+            }
+        }
+        
+        # Map chart type and intent to palette
+        palette_key = f"{user_intent}_{chart_type}" if f"{user_intent}_{chart_type}" in palettes else chart_type if chart_type in palettes else 'default'
+        palette = palettes.get(palette_key, palettes['default'])
+        
+        # Define design constraints based on chart type
+        constraints = {
+            'bar': {
+                'color_palette': f"{', '.join(palette['names'][:3])}",
+                'axis_scale': 'Linear scale with auto-range for optimal data spread',
+                'labeling_focus': 'Category labels on Y-axis, value labels on bars for readability'
+            },
+            'line': {
+                'color_palette': f"{', '.join(palette['names'][:3])}",
+                'axis_scale': 'Time-based X-axis with adaptive intervals, linear Y-axis',
+                'labeling_focus': 'Clear date/time labels, gridlines for trend tracking'
+            },
+            'scatter': {
+                'color_palette': f"{', '.join(palette['names'][:3])}",
+                'axis_scale': 'Proportional scales to reveal correlations and outliers',
+                'labeling_focus': 'Both axes labeled with units, hover tooltips for data points'
+            },
+            'pie': {
+                'color_palette': f"{', '.join(palette['names'][:4])}",
+                'axis_scale': 'Percentage-based proportions (0-100%)',
+                'labeling_focus': 'Segment labels with percentages, legend for clarity'
+            },
+            'histogram': {
+                'color_palette': f"{', '.join(palette['names'][:2])}",
+                'axis_scale': 'Binned X-axis for data ranges, frequency count on Y-axis',
+                'labeling_focus': 'Range labels on bins, count labels for peak values'
+            },
+            'box': {
+                'color_palette': f"{', '.join(palette['names'][:3])}",
+                'axis_scale': 'Categorical grouping with quartile-based distribution',
+                'labeling_focus': 'Category names, median/quartile markers, outlier indication'
+            }
+        }
+        
+        constraint = constraints.get(chart_type, constraints['bar'])
+        
+        return {
+            'color_palette': palette['colors'],
+            'color_names': palette['names'],
+            'colorscale': palette['colorscale'],
+            'design_constraints': {
+                '1_color_palette': constraint['color_palette'],
+                '2_axis_scale': constraint['axis_scale'],
+                '3_labeling_focus': constraint['labeling_focus']
+            }
+        }
+    
     def _detect_chart_intent(self, data_goal: str) -> str:
         """
         Detect what type of charts the user wants based on their description.
@@ -252,6 +348,9 @@ class DataAnalyzer:
                         daily_data = df_time.groupby(df_time[date_col].dt.date)[num_col].sum().reset_index()
                         daily_data.columns = ['Date', num_col]
                         
+                        # Get design constraints
+                        design = self._get_color_palette_and_constraints('line', user_intent)
+                        
                         fig = px.line(
                             daily_data,
                             x='Date',
@@ -260,13 +359,16 @@ class DataAnalyzer:
                             labels={num_col: num_col, 'Date': 'Date'}
                         )
                         
-                        fig.update_traces(line_color='#3498db', line_width=3, mode='lines+markers')
+                        fig.update_traces(line_color=design['color_palette'][0], line_width=3, mode='lines+markers')
                         fig.update_layout(height=500)
                         
                         charts.append({
                             'figure': fig,
                             'title': f'🎯 {num_col} Over Time (Requested)',
-                            'description': f'Time series showing {num_col} trend based on your request{sample_note}'
+                            'description': f'Time series showing {num_col} trend based on your request{sample_note}',
+                            'chart_type': 'Line Chart',
+                            'color_palette': design['color_names'][:3],
+                            'design_constraints': design['design_constraints']
                         })
                         print(f"✅ Created TREND chart (user requested): {num_col} over {date_col}")
                     except Exception as e:
@@ -287,6 +389,9 @@ class DataAnalyzer:
                         top_n = min(15, unique_count)
                         agg_data = df.groupby(cat_col)[num_col].sum().nlargest(top_n).sort_values()
                         
+                        # Get design constraints
+                        design = self._get_color_palette_and_constraints('bar', user_intent)
+                        
                         fig = go.Figure(data=[
                             go.Bar(
                                 x=agg_data.values,
@@ -294,7 +399,7 @@ class DataAnalyzer:
                                 orientation='h',
                                 marker=dict(
                                     color=agg_data.values,
-                                    colorscale='Viridis',
+                                    colorscale=design['colorscale'],
                                     showscale=False
                                 ),
                                 text=[f'{val:,.1f}' for val in agg_data.values],
@@ -313,7 +418,10 @@ class DataAnalyzer:
                         charts.append({
                             'figure': fig,
                             'title': f'🎯 {num_col} by {cat_col} (Requested)',
-                            'description': f'Comparison chart based on your request{sample_note}'
+                            'description': f'Comparison chart based on your request{sample_note}',
+                            'chart_type': 'Bar Chart',
+                            'color_palette': design['color_names'][:3],
+                            'design_constraints': design['design_constraints']
                         })
                         print(f"✅ Created COMPARISON chart (user requested): {num_col} by {cat_col}")
                     except Exception as e:
@@ -327,12 +435,15 @@ class DataAnalyzer:
                 if len(charts) >= 8:
                     break
                 try:
+                    # Get design constraints
+                    design = self._get_color_palette_and_constraints('histogram', user_intent)
+                    
                     fig = px.histogram(
                         df_viz,
                         x=num_col,
                         title=f'📊 Distribution of {num_col}{sample_note}',
                         labels={num_col: num_col},
-                        color_discrete_sequence=['#e74c3c'],
+                        color_discrete_sequence=[design['color_palette'][0]],
                         nbins=50
                     )
                     fig.update_layout(height=500, showlegend=False)
@@ -340,7 +451,10 @@ class DataAnalyzer:
                     charts.append({
                         'figure': fig,
                         'title': f'🎯 {num_col} Distribution (Requested)',
-                        'description': f'Distribution chart based on your request{sample_note}'
+                        'description': f'Distribution chart based on your request{sample_note}',
+                        'chart_type': 'Histogram',
+                        'color_palette': design['color_names'][:2],
+                        'design_constraints': design['design_constraints']
                     })
                     print(f"✅ Created DISTRIBUTION chart (user requested): {num_col}")
                 except Exception as e:
@@ -360,6 +474,9 @@ class DataAnalyzer:
                     if len(sample_df) == 0:
                         continue
                     
+                    # Get design constraints
+                    design = self._get_color_palette_and_constraints('scatter', user_intent)
+                    
                     fig = px.scatter(
                         sample_df,
                         x=col1,
@@ -367,7 +484,7 @@ class DataAnalyzer:
                         title=f'🔍 {col1} vs {col2} Relationship{sample_note}',
                         labels={col1: col1, col2: col2},
                         opacity=0.6,
-                        color_discrete_sequence=['#9b59b6'],
+                        color_discrete_sequence=[design['color_palette'][0]],
                         trendline="ols"  # Add trend line
                     )
                     fig.update_layout(height=500)
@@ -375,7 +492,10 @@ class DataAnalyzer:
                     charts.append({
                         'figure': fig,
                         'title': f'🎯 {col1} vs {col2} (Requested)',
-                        'description': f'Relationship analysis based on your request{sample_note}'
+                        'description': f'Relationship analysis based on your request{sample_note}',
+                        'chart_type': 'Scatter Plot',
+                        'color_palette': design['color_names'][:3],
+                        'design_constraints': design['design_constraints']
                     })
                     print(f"✅ Created RELATIONSHIP chart (user requested): {col1} vs {col2}")
                 except Exception as e:
@@ -404,6 +524,9 @@ class DataAnalyzer:
                         top_n = min(15, unique_count)
                         agg_data = df.groupby(cat_col)[num_col].sum().nlargest(top_n).sort_values()
                         
+                        # Get design constraints
+                        design = self._get_color_palette_and_constraints('bar', 'comparison')
+                        
                         fig = go.Figure(data=[
                             go.Bar(
                                 x=agg_data.values,
@@ -411,7 +534,7 @@ class DataAnalyzer:
                                 orientation='h',
                                 marker=dict(
                                     color=agg_data.values,
-                                    colorscale=['#3498db', '#2ecc71', '#f39c12', '#e74c3c'],
+                                    colorscale=design['colorscale'],
                                     showscale=False
                                 ),
                                 text=[f'{val:,.1f}' for val in agg_data.values],
@@ -430,7 +553,10 @@ class DataAnalyzer:
                         charts.append({
                             'figure': fig,
                             'title': f'{num_col} by {cat_col}',
-                            'description': f'Bar chart showing {num_col} across {cat_col}{sample_note}'
+                            'description': f'Bar chart showing {num_col} across {cat_col}{sample_note}',
+                            'chart_type': 'Bar Chart',
+                            'color_palette': design['color_names'][:3],
+                            'design_constraints': design['design_constraints']
                         })
                         print(f"✅ Created chart: {num_col} by {cat_col}")
                     except Exception as e:
@@ -514,12 +640,15 @@ class DataAnalyzer:
                     
                     value_counts = df[cat_col].value_counts().head(10)
                     
+                    # Get design constraints
+                    design = self._get_color_palette_and_constraints('pie', 'proportion')
+                    
                     fig = go.Figure(data=[
                         go.Pie(
                             labels=value_counts.index,
                             values=value_counts.values,
                             hole=0.4,
-                            marker=dict(colors=['#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c', '#e67e22', '#95a5a6'])
+                            marker=dict(colors=design['color_palette'])
                         )
                     ])
                     
@@ -531,7 +660,10 @@ class DataAnalyzer:
                     charts.append({
                         'figure': fig,
                         'title': f'{cat_col} Breakdown',
-                        'description': f'Pie chart showing {cat_col} distribution{sample_note}'
+                        'description': f'Pie chart showing {cat_col} distribution{sample_note}',
+                        'chart_type': 'Pie Chart',
+                        'color_palette': design['color_names'][:4],
+                        'design_constraints': design['design_constraints']
                     })
                     print(f"✅ Created pie chart: {cat_col}")
                 except Exception as e:

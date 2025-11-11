@@ -20,6 +20,26 @@ from utils.formatting import (
 )
 
 
+# Check if Kaleido is available for PNG export
+def check_kaleido_available():
+    """Check if Kaleido/Chrome is available for PNG export."""
+    try:
+        import plotly.graph_objects as go
+        # Try to create a simple figure and export it
+        test_fig = go.Figure(data=[go.Scatter(x=[1], y=[1])])
+        test_fig.to_image(format="png", width=100, height=100)
+        return True
+    except Exception:
+        return False
+
+
+# Cache the result to avoid checking multiple times
+@st.cache_data
+def is_png_export_available():
+    """Cached check for PNG export availability."""
+    return check_kaleido_available()
+
+
 def export_chart_to_png(fig, filename="chart.png"):
     """
     Export Plotly figure to PNG format.
@@ -29,14 +49,14 @@ def export_chart_to_png(fig, filename="chart.png"):
         filename: Name for the downloaded file
         
     Returns:
-        PNG bytes data
+        PNG bytes data or None if export fails
     """
     try:
         # Export figure as PNG bytes
         img_bytes = fig.to_image(format="png", width=1200, height=800, scale=2)
         return img_bytes
     except Exception as e:
-        st.error(f"Error exporting chart: {str(e)}")
+        # Silently fail - the UI will handle showing appropriate message
         return None
 
 
@@ -350,6 +370,13 @@ def show_data_analysis_mode():
                 st.header("📊 Visualizations")
                 st.write("Automatically generated charts based on your data:")
                 
+                # Check PNG export availability once
+                png_available = is_png_export_available()
+                
+                # Show info message if PNG export is not available
+                if not png_available:
+                    st.info("💡 **Tip:** PNG export requires Chrome/Chromium. You can still interact with and use the charts below. To enable PNG downloads, run: `pip install kaleido` and install Chrome.")
+                
                 for i, chart_data in enumerate(charts, 1):
                     with st.container():
                         col_title, col_download = st.columns([3, 1])
@@ -358,22 +385,23 @@ def show_data_analysis_mode():
                             st.subheader(f"{i}. {chart_data['title']}")
                         
                         with col_download:
-                            # PNG download button
-                            try:
-                                img_bytes = export_chart_to_png(
-                                    chart_data['figure'], 
-                                    f"{chart_data['title'].lower().replace(' ', '_')}.png"
-                                )
-                                if img_bytes:
-                                    st.download_button(
-                                        label="📥 PNG",
-                                        data=img_bytes,
-                                        file_name=f"{chart_data['title'].lower().replace(' ', '_')}.png",
-                                        mime="image/png",
-                                        key=f"download_png_{i}"
+                            # PNG download button - only show if available
+                            if png_available:
+                                try:
+                                    img_bytes = export_chart_to_png(
+                                        chart_data['figure'], 
+                                        f"{chart_data['title'].lower().replace(' ', '_')}.png"
                                     )
-                            except Exception as e:
-                                st.caption("⚠️ PNG export requires kaleido package")
+                                    if img_bytes:
+                                        st.download_button(
+                                            label="📥 PNG",
+                                            data=img_bytes,
+                                            file_name=f"{chart_data['title'].lower().replace(' ', '_')}.png",
+                                            mime="image/png",
+                                            key=f"download_png_{i}"
+                                        )
+                                except Exception:
+                                    pass  # Silently skip if export fails
                         
                         st.write(chart_data['description'])
                         st.plotly_chart(chart_data['figure'], use_container_width=True)

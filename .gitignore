@@ -40,8 +40,10 @@ Thumbs.db
 # Streamlit
 .streamlit/secrets.toml
 
-# Data files (optional - uncomment if you don't want to upload large datasets)
-# *.csv
+# Data files (large datasets excluded from Git)
+*.csv
+1000000 Sales Records.csv
+Flipkart Sales Dataset.csv
 # *.xlsx
 # *.xls
 
